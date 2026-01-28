@@ -119,6 +119,37 @@
             70% { box-shadow: 0 0 0 30px rgba(255, 215, 0, 0); }
             100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
         }
+
+        /* Reaction Buttons Styling */
+        .reaction-btn {
+            font-size: 1.5rem;
+            filter: grayscale(100%);
+            opacity: 0.6;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+        .reaction-btn:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-3px);
+        }
+        .reaction-btn.active {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.2);
+            background: rgba(65, 105, 225, 0.2);
+            border: 1px solid rgba(65, 105, 225, 0.5);
+            box-shadow: 0 0 15px rgba(65, 105, 225, 0.4);
+        }
     </style>
 </head>
 <body class="min-h-screen relative selection:bg-royal selection:text-white">
@@ -260,6 +291,10 @@
                 <p class="text-xl md:text-2xl text-slate-300 leading-loose">
                     عايز أقولك إنك <span class="text-royal font-bold">أشطر وأذكى</span> حد ممكن الواحد يقابله. ليكي طلة وليكي حضور بيخطف الأنظار من غير مجهود. شطارتك في الشغل وفي الحياة وتعاملك مع الناس بيخلينا كلنا فخورين بيكي.
                 </p>
+                <!-- Reactions for Section 2 -->
+                <div class="mt-6 border-t border-slate-600/50 pt-4 flex justify-center gap-4" id="reactions-surprise-card">
+                    <!-- Injected by JS -->
+                </div>
             </div>
 
             <!-- Section 3 -->
@@ -276,6 +311,10 @@
                 <p class="text-lg text-slate-300 leading-loose">
                     متخليش أي حاجة تضايقك ولا تشيلي هم الدنيا. أنتي قوية، وجميلة، ومحبوبة. خليكي دايماً واثقة في نفسك وفي قدراتك لأنك تقدري تعملي المعجزات. ابتسامتك دي "حياة" تانية، فإوعي تغيبيها عننا.
                 </p>
+                <!-- Reactions for Section 4 -->
+                <div class="mt-6 border-t border-slate-600/50 pt-4 flex justify-center gap-4" id="reactions-surprise-msg">
+                    <!-- Injected by JS -->
+                </div>
             </div>
 
             <!-- Section 5: Closing -->
@@ -308,9 +347,15 @@
                     محتوى الكلام...
                 </p>
                 <div class="w-24 h-1 bg-royal mx-auto rounded-full opacity-50"></div>
-                <p class="text-royal text-lg">أنتي تستاهلي أكتر من كده بكتير ✨</p>
                 
-                <div class="pt-6">
+                <!-- Dynamic Reactions for Modal -->
+                <div class="flex justify-center items-center gap-4 mt-4" id="reactions-modal-container">
+                    <!-- Injected by JS -->
+                </div>
+
+                <p class="text-royal text-lg mt-4">أنتي تستاهلي أكتر من كده بكتير ✨</p>
+                
+                <div class="pt-2">
                     <button onclick="closeModal()" class="royal-btn text-white px-10 py-3 rounded-full shadow-lg font-bold">
                         حبيبتي يا ملوكه
                     </button>
@@ -320,7 +365,14 @@
     </div>
 
     <script>
-        // Data for categories (Expanded Content)
+        // --- 1. CONFIGURATION & DATA ---
+        const REACTION_ICONS = [
+            { id: 'love', icon: '❤️' },
+            { id: 'wow', icon: '😍' },
+            { id: 'bravo', icon: '👏' },
+            { id: 'amazing', icon: '✨' }
+        ];
+
         const categories = {
             specs: {
                 icon: '📜',
@@ -349,7 +401,63 @@
             }
         };
 
-        // Navigation Functions
+        // --- 2. REACTION LOGIC ---
+
+        function getStoredReactions() {
+            const stored = localStorage.getItem('maloka_reactions');
+            return stored ? JSON.parse(stored) : {};
+        }
+
+        function saveReaction(contentId, reactionId) {
+            const current = getStoredReactions();
+            // Toggle logic: if clicking same reaction, remove it (unlike)
+            if (current[contentId] === reactionId) {
+                delete current[contentId];
+            } else {
+                current[contentId] = reactionId;
+            }
+            localStorage.setItem('maloka_reactions', JSON.stringify(current));
+            renderAllReactions(); // Re-render to update UI
+        }
+
+        function renderReactionsHTML(contentId) {
+            const storedData = getStoredReactions();
+            const activeReaction = storedData[contentId];
+
+            return REACTION_ICONS.map(item => {
+                const isActive = activeReaction === item.id;
+                const activeClass = isActive ? 'active' : '';
+                return `
+                    <div class="reaction-btn ${activeClass}" 
+                         onclick="saveReaction('${contentId}', '${item.id}')"
+                         title="${item.id}">
+                        ${item.icon}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize static reactions on the Surprise Page
+        function initStaticReactions() {
+            document.getElementById('reactions-surprise-card').innerHTML = renderReactionsHTML('surprise_card');
+            document.getElementById('reactions-surprise-msg').innerHTML = renderReactionsHTML('surprise_msg');
+        }
+        
+        // Helper to update all visible reaction containers (called after any click)
+        function renderAllReactions() {
+            // Update static ones
+            initStaticReactions();
+            
+            // Update modal if open (we need to know current category)
+            // We store current category in a global variable
+            if (window.currentCategory) {
+                document.getElementById('reactions-modal-container').innerHTML = renderReactionsHTML(`cat_${window.currentCategory}`);
+            }
+        }
+
+
+        // --- 3. NAVIGATION & UI FUNCTIONS ---
+
         function resetToHome() {
             closeSurprise();
             const menu = document.getElementById('sideMenu');
@@ -385,9 +493,16 @@
             const data = categories[key];
             if (!data) return;
 
+            // Set global current category for reaction logic
+            window.currentCategory = key;
+
             document.getElementById('modalIcon').textContent = data.icon;
             document.getElementById('modalTitle').textContent = data.title;
             document.getElementById('modalContent').textContent = data.content;
+
+            // Render reactions for this specific category
+            const reactionContainer = document.getElementById('reactions-modal-container');
+            reactionContainer.innerHTML = renderReactionsHTML(`cat_${key}`);
 
             const modal = document.getElementById('infoModal');
             const card = document.getElementById('modalCard');
@@ -412,6 +527,8 @@
             const modal = document.getElementById('infoModal');
             const card = document.getElementById('modalCard');
             
+            window.currentCategory = null; // Clear current category
+
             card.classList.remove('scale-100', 'opacity-100');
             card.classList.add('scale-95', 'opacity-0');
             
@@ -420,7 +537,7 @@
             }, 300);
         }
 
-        // Surprise & Balloon Logic
+        // --- 4. SURPRISE & BALLOON LOGIC ---
         let balloonInterval;
 
         function startSurprise() {
@@ -428,29 +545,26 @@
             surprisePage.classList.remove('hidden');
             surprisePage.classList.add('flex');
             
+            // Initialize reactions when surprise page opens (in case it wasn't done)
+            initStaticReactions();
+
             // Reset scroll to top
             surprisePage.scrollTop = 0;
 
             // Start balloons
             const container = document.getElementById('balloonsContainer');
-            container.innerHTML = ''; // clear any existing
-            container.style.opacity = '1'; // Ensure visible
+            container.innerHTML = ''; 
+            container.style.opacity = '1'; 
 
-            // Create initial burst
             for(let i=0; i<15; i++) createBalloon();
 
-            // Continue creating balloons rapidly
             balloonInterval = setInterval(createBalloon, 300);
 
-            // STOP balloons after 3 seconds and fade them out
             setTimeout(() => {
-                clearInterval(balloonInterval); // Stop creating new ones
-                
-                // Optional: Fade out the container so existing ones disappear gracefully
+                clearInterval(balloonInterval); 
                 container.style.transition = 'opacity 2s ease-out';
                 container.style.opacity = '0';
                 
-                // Clear DOM after fade out
                 setTimeout(() => {
                     container.innerHTML = '';
                 }, 2000);
@@ -474,21 +588,26 @@
             
             const colors = ['#4169E1', '#FFD700', '#FF69B4', '#8A2BE2', '#00FFFF'];
             const bg = colors[Math.floor(Math.random() * colors.length)];
-            const left = Math.floor(Math.random() * 90) + 5; // Avoid edges
+            const left = Math.floor(Math.random() * 90) + 5; 
             
             balloon.style.backgroundColor = bg;
             balloon.style.left = `${left}%`;
-            // Randomize speed slightly
-            const duration = Math.random() * 2 + 3; // 3 to 5 seconds
+            const duration = Math.random() * 2 + 3; 
             balloon.style.animationDuration = `${duration}s`;
             
             container.appendChild(balloon);
 
-            // Remove balloon from DOM after animation finishes to prevent lag
             setTimeout(() => {
                 balloon.remove();
             }, duration * 1000);
         }
+
+        // --- 5. INITIALIZATION ---
+        // Load reactions on initial page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initStaticReactions();
+        });
+
     </script>
 </body>
 </html>
