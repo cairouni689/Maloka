@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملوكه تفرح وتتبسط</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        royal: '#4169E1',
+                        darkbg: '#0f172a',
+                        cardbg: '#1e293b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar for Dark Mode */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4169E1; 
+            border-radius: 4px;
+        }
+
+        /* Balloon Animation */
+        .balloon {
+            position: absolute;
+            bottom: -100px;
+            width: 40px;
+            height: 50px;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: floatUp 4s ease-in infinite;
+            z-index: 40;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3);
+        }
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 30px;
+            background: rgba(255,255,255,0.3);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(-100vh) rotate(20deg); opacity: 0; }
+        }
+
+        /* Fade Up Text Animation */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .delay-100 { animation-delay: 0.2s; }
+        .delay-200 { animation-delay: 0.5s; }
+        .delay-300 { animation-delay: 0.8s; }
+        .delay-400 { animation-delay: 1.2s; }
+        .delay-500 { animation-delay: 1.5s; }
+        .delay-600 { animation-delay: 1.8s; }
+        .delay-700 { animation-delay: 2.1s; }
+
+        /* Royal Blue Button Hover Effect */
+        .royal-btn {
+            background-color: #4169E1; 
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(65, 105, 225, 0.3);
+        }
+        .royal-btn:hover {
+            transform: scale(1.05);
+            background-color: #3b5bdb;
+            box-shadow: 0 0 30px rgba(65, 105, 225, 0.5);
+        }
+
+        /* Glassmorphism for cards (Dark Version) */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-glass {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(65, 105, 225, 0.3);
+        }
+
+        /* Happiness Icon Pulse */
+        .happy-pulse {
+            animation: pulse-glow 3s infinite;
+        }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
+            70% { box-shadow: 0 0 0 30px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative selection:bg-royal selection:text-white">
+
+    <!-- Header -->
+    <header onclick="resetToHome()" class="fixed top-0 w-full z-[60] glass-card shadow-lg px-6 py-4 flex justify-between items-center cursor-pointer transition hover:bg-slate-800/80">
+        <div class="flex items-center gap-3">
+            <div class="bg-slate-700/50 p-2 rounded-full border border-slate-600">
+                <!-- Cute Bear Icon -->
+                <span class="text-2xl">🧸</span>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold text-white tracking-wide">ملوكه <span class="text-royal">تفرح</span></h1>
+            </div>
+        </div>
+        
+        <!-- Hamburger Menu Button (Stop propagation to prevent header click) -->
+        <button onclick="event.stopPropagation(); toggleMenu()" class="text-white hover:text-royal focus:outline-none p-2 rounded-lg transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
+    </header>
+
+    <!-- Side Menu -->
+    <div id="sideMenu" class="fixed inset-0 bg-black/80 z-[70] hidden transition-opacity duration-300 backdrop-blur-sm">
+        <div class="absolute left-0 top-0 h-full w-3/4 max-w-sm bg-slate-900 shadow-2xl transform -translate-x-full transition-transform duration-300 flex flex-col border-r border-slate-700" id="menuPanel">
+            <div class="p-6 bg-slate-800 flex justify-between items-center border-b border-slate-700">
+                <h2 class="text-xl font-bold text-royal">القائمة الملكية 👑</h2>
+                <button onclick="toggleMenu()" class="text-gray-400 hover:text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="p-4 space-y-3 overflow-y-auto flex-1">
+                <!-- Menu Items -->
+                <button onclick="showCategory('specs')" class="w-full text-right p-4 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-royal transition flex items-center gap-4 text-slate-200 group">
+                    <span class="text-2xl group-hover:scale-110 transition">📜</span> 
+                    <span class="font-semibold">مواصفات ملك</span>
+                </button>
+                <button onclick="showCategory('team')" class="w-full text-right p-4 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-royal transition flex items-center gap-4 text-slate-200 group">
+                    <span class="text-2xl group-hover:scale-110 transition">🏆</span> 
+                    <span class="font-semibold">أسطورة التيم</span>
+                </button>
+                <button onclick="showCategory('kindness')" class="w-full text-right p-4 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-royal transition flex items-center gap-4 text-slate-200 group">
+                    <span class="text-2xl group-hover:scale-110 transition">💖</span> 
+                    <span class="font-semibold">حنية وطيبة قلب</span>
+                </button>
+                <button onclick="showCategory('happiness')" class="w-full text-right p-4 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-royal transition flex items-center gap-4 text-slate-200 group">
+                    <span class="text-2xl group-hover:scale-110 transition">🌟</span> 
+                    <span class="font-semibold">مصدر البهجة</span>
+                </button>
+                <button onclick="showCategory('innocence')" class="w-full text-right p-4 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-royal transition flex items-center gap-4 text-slate-200 group">
+                    <span class="text-2xl group-hover:scale-110 transition">💎</span> 
+                    <span class="font-semibold">النية الصافية</span>
+                </button>
+            </div>
+            
+            <div class="p-6 text-center text-xs text-slate-500 bg-slate-900 border-t border-slate-800">
+                صنع بكل حب وتقدير لملك ❤️
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Hero Section -->
+    <main id="mainContent" class="pt-24 min-h-screen flex flex-col items-center justify-center p-6 text-center transition-all duration-500 relative z-10">
+        
+        <!-- Happiness Image/Icon Area -->
+        <div class="mb-10 relative group">
+            <div class="absolute -inset-4 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 happy-pulse"></div>
+            <div class="relative w-52 h-52 bg-gradient-to-b from-slate-800 to-slate-900 rounded-full flex items-center justify-center shadow-2xl border-4 border-slate-700 overflow-hidden">
+                <!-- SVG Illustration of Happiness/Sun/Joy -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-32 h-32 animate-[spin_10s_linear_infinite]">
+                    <!-- Sun Rays -->
+                    <circle cx="50" cy="50" r="20" fill="#FDB813" />
+                    <g stroke="#FDB813" stroke-width="4" stroke-linecap="round">
+                        <line x1="50" y1="15" x2="50" y2="5" />
+                        <line x1="50" y1="85" x2="50" y2="95" />
+                        <line x1="15" y1="50" x2="5" y2="50" />
+                        <line x1="85" y1="50" x2="95" y2="50" />
+                        <line x1="25" y1="25" x2="18" y2="18" />
+                        <line x1="75" y1="75" x2="82" y2="82" />
+                        <line x1="25" y1="75" x2="18" y2="82" />
+                        <line x1="75" y1="25" x2="82" y2="18" />
+                    </g>
+                </svg>
+                <div class="absolute bottom-4 text-3xl">✨😄✨</div>
+            </div>
+        </div>
+
+        <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight drop-shadow-lg">
+            أهلاً بيكي يا <span class="text-royal">بهجة الأيام</span>
+        </h2>
+        <p class="text-lg text-slate-300 mb-12 max-w-lg mx-auto leading-relaxed">
+            الموقع ده محاولة بسيطة عشان نقولك قد إيه وجودك فارق، وقد إيه أنتي شخص جميل من جوه ومن بره.
+        </p>
+
+        <button onclick="startSurprise()" class="royal-btn text-white text-xl font-bold py-5 px-12 rounded-full flex items-center gap-3 relative overflow-hidden group">
+            <span class="relative z-10">اضغطي هنا للانبساط</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-bounce relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <!-- Hover effect fill -->
+            <div class="absolute inset-0 bg-white/10 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+        </button>
+
+    </main>
+
+    <!-- Surprise Page (Overlay - Scrollable) -->
+    <div id="surprisePage" class="fixed inset-0 bg-[#0f172a] z-50 hidden flex-col items-center text-center overflow-y-auto">
+        
+        <!-- Back Button within Surprise -->
+        <button onclick="closeSurprise()" class="fixed top-24 left-6 bg-slate-800/80 backdrop-blur border border-slate-600 p-3 rounded-full text-white hover:bg-royal transition z-[60] shadow-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <!-- Container for balloons (Fixed position) -->
+        <div id="balloonsContainer" class="fixed inset-0 pointer-events-none overflow-hidden z-[45]"></div>
+
+        <!-- Content Container -->
+        <div class="relative z-50 w-full max-w-3xl px-6 py-32 md:py-40 flex flex-col gap-12">
+            
+            <!-- Section 1 -->
+            <div class="space-y-6">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-royal mb-8 fade-up drop-shadow-sm">
+                    ملوكه الغالية جداً ❤️
+                </h1>
+                <p class="text-2xl md:text-3xl text-slate-200 font-semibold fade-up delay-100 leading-normal">
+                    أنتي مش مجرد شخص عادي، أنتي حالة حلوة بتيجي في حياة الناس عشان تحليها.
+                </p>
+            </div>
+
+            <!-- Section 2: Card style -->
+            <div class="fade-up delay-200 glass-card p-8 rounded-2xl shadow-xl transform transition hover:scale-[1.02]">
+                <p class="text-xl md:text-2xl text-slate-300 leading-loose">
+                    عايز أقولك إنك <span class="text-royal font-bold">أشطر وأذكى</span> حد ممكن الواحد يقابله. ليكي طلة وليكي حضور بيخطف الأنظار من غير مجهود. شطارتك في الشغل وفي الحياة وتعاملك مع الناس بيخلينا كلنا فخورين بيكي.
+                </p>
+            </div>
+
+            <!-- Section 3 -->
+            <div class="space-y-6 fade-up delay-300">
+                <div class="text-6xl animate-pulse">✨👑✨</div>
+                <p class="text-xl md:text-2xl text-slate-200 leading-relaxed">
+                    قلبك الأبيض ده كنز، ومعدنك الأصيل بيبان في كل موقف. ربنا يحبب فيكي خلقه كمان وكمان لأنك تستاهلي كل خير الدنيا.
+                </p>
+            </div>
+
+            <!-- Section 4: More Compliments -->
+            <div class="fade-up delay-400 glass-card p-8 rounded-2xl shadow-xl border-r-4 border-royal text-right">
+                <h3 class="text-xl font-bold text-royal mb-4">رسالة ليكي:</h3>
+                <p class="text-lg text-slate-300 leading-loose">
+                    متخليش أي حاجة تضايقك ولا تشيلي هم الدنيا. أنتي قوية، وجميلة، ومحبوبة. خليكي دايماً واثقة في نفسك وفي قدراتك لأنك تقدري تعملي المعجزات. ابتسامتك دي "حياة" تانية، فإوعي تغيبيها عننا.
+                </p>
+            </div>
+
+            <!-- Section 5: Closing -->
+            <div class="fade-up delay-500 pb-20">
+                <p class="text-3xl font-bold text-white mb-6">
+                    بنحبك جداً يا ملوكه! ❤️
+                </p>
+                <button onclick="closeSurprise()" class="px-8 py-3 bg-slate-800 text-royal border border-royal rounded-full hover:bg-royal hover:text-white transition">
+                    رجوع للصفحة الرئيسية
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="infoModal" class="fixed inset-0 bg-black/90 z-[80] hidden flex items-center justify-center p-4 backdrop-blur-md transition-opacity">
+        <div class="modal-glass rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden transform scale-95 opacity-0 transition-all duration-300 max-h-[80vh] overflow-y-auto" id="modalCard">
+            <div class="bg-slate-800/80 p-6 text-center border-b border-slate-700 relative sticky top-0 z-10 backdrop-blur-md">
+                <div class="text-6xl mb-4 animate-bounce" id="modalIcon">👑</div>
+                <h3 class="text-3xl font-bold text-white" id="modalTitle">عنوان الفئة</h3>
+                <button onclick="closeModal()" class="absolute top-4 left-4 text-slate-400 hover:text-red-400 bg-slate-900/50 rounded-full p-1 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-8 md:p-10 text-center space-y-6">
+                <p class="text-xl md:text-2xl leading-loose text-slate-300 font-medium" id="modalContent">
+                    محتوى الكلام...
+                </p>
+                <div class="w-24 h-1 bg-royal mx-auto rounded-full opacity-50"></div>
+                <p class="text-royal text-lg">أنتي تستاهلي أكتر من كده بكتير ✨</p>
+                
+                <div class="pt-6">
+                    <button onclick="closeModal()" class="royal-btn text-white px-10 py-3 rounded-full shadow-lg font-bold">
+                        حبيبتي يا ملوكه
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data for categories (Expanded Content)
+        const categories = {
+            specs: {
+                icon: '📜',
+                title: 'مواصفات ملك محمد محروس',
+                content: 'لما نيجي نوصف ملك، الحروف بتعجز. إحنا قدام "أيقونة" من الجمال والذكاء. شخصية جامعة بين الرقة والقوة، بين العقل والقلب. ذكية جداً وبتلقطها وهي طايرة، وفي نفس الوقت متواضعة وبسيطة. ملك هي المثال الحي للبنت اللي بتعرف تكون "ليدي" وفي نفس الوقت "بميت راجل" في المواقف الصعبة. ملامحك المريحة وروحك الخفيفة بتخلي أي مكان تدخليه ينور حرفياً.'
+            },
+            team: {
+                icon: '🏆',
+                title: 'الأسطورة في التيم',
+                content: 'من غير أي مجاملة، التيم من غيرك ولا حاجة! أنتي "الدينامو" المحرك لكل حاجة حلوة بتحصل. لما بتبقي موجودة الكل بيبقى مطمن. بتعرفي تحلي المشاكل اللي بتعقد أعتى الناس بابتسامة وهدوء أعصاب يحسدك عليه الجميع. إخلاصك في الشغل وتفانيكي ده درس لينا كلنا. أنتي مش بس زميلة، أنتي قائدة بالفطرة وسند حقيقي لينا كلنا.'
+            },
+            kindness: {
+                icon: '💖',
+                title: 'منبع الحنية والطيبة',
+                content: 'قلبك ده محتاج يتدرس في كتب الإنسانية. في زمن القسوة فيه زادت، أنتي لسه محافظة على نقاء وطيبة الزمن الجميل. بتخافي تجرحي حد بكلمة، وبتراعي مشاعر الصغير قبل الكبير. حنيتك بتغطي على كل اللي حواليكي، وأي حد بيقرب منك بيحس بدفا وأمان مش طبيعي. يا بخت اللي في حياته شخص بقلب ملك محمد محروس.'
+            },
+            happiness: {
+                icon: '🌟',
+                title: 'مصدر البهجة والسرور',
+                content: 'عارفة يعني إيه "فيتامين فرحة"؟ دي أنتي! ضحكتك رنة موسيقية بتظبط مود الكون. لما بتضحكي الدنيا بتضحك معاكي. عندك قدرة عجيبة تحولي القعدة العادية لقعدة كلها ضحك وانبساط. طاقتك الإيجابية بتعدي، ومجرد وجودك كفيل ينسي الواحد همومه. ربنا يحفظلك الضحكة دي وميغيبهاش أبداً لأنها شريان حياة لناس كتير.'
+            },
+            innocence: {
+                icon: '💎',
+                title: 'النية الصافية والقلب الأبيض',
+                content: 'اللي في قلبك على لسانك، لا بتعرفي تلفي ولا تدوري، ولا ليكي في الحوارات. إنسانة واضحة وصريحة ونقية زي الميه الصافية. في عز ما الناس بتتلون، أنتي ثابتة على مبادئك وعلى فطرتك الجميلة. نيتك السالكة دي هي سر توفيق ربنا ليكي، وهي اللي مخلياكي "محبوبة الجماهير". ربنا يرزقك على قد نيتك دي أضعاف مضاعفة.'
+            }
+        };
+
+        // Navigation Functions
+        function resetToHome() {
+            closeSurprise();
+            const menu = document.getElementById('sideMenu');
+            const panel = document.getElementById('menuPanel');
+            if (!menu.classList.contains('hidden')) {
+                panel.classList.add('-translate-x-full');
+                setTimeout(() => {
+                    menu.classList.add('hidden');
+                }, 300);
+            }
+            closeModal();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const panel = document.getElementById('menuPanel');
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                setTimeout(() => {
+                    panel.classList.remove('-translate-x-full');
+                }, 10);
+            } else {
+                panel.classList.add('-translate-x-full');
+                setTimeout(() => {
+                    menu.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function showCategory(key) {
+            const data = categories[key];
+            if (!data) return;
+
+            document.getElementById('modalIcon').textContent = data.icon;
+            document.getElementById('modalTitle').textContent = data.title;
+            document.getElementById('modalContent').textContent = data.content;
+
+            const modal = document.getElementById('infoModal');
+            const card = document.getElementById('modalCard');
+            
+            const menu = document.getElementById('sideMenu');
+            const panel = document.getElementById('menuPanel');
+            
+            // Close menu
+            panel.classList.add('-translate-x-full');
+            setTimeout(() => {
+                menu.classList.add('hidden');
+                // Open Modal
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    card.classList.remove('scale-95', 'opacity-0');
+                    card.classList.add('scale-100', 'opacity-100');
+                }, 50);
+            }, 300);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('infoModal');
+            const card = document.getElementById('modalCard');
+            
+            card.classList.remove('scale-100', 'opacity-100');
+            card.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Surprise & Balloon Logic
+        let balloonInterval;
+
+        function startSurprise() {
+            const surprisePage = document.getElementById('surprisePage');
+            surprisePage.classList.remove('hidden');
+            surprisePage.classList.add('flex');
+            
+            // Reset scroll to top
+            surprisePage.scrollTop = 0;
+
+            // Start balloons
+            const container = document.getElementById('balloonsContainer');
+            container.innerHTML = ''; // clear any existing
+            container.style.opacity = '1'; // Ensure visible
+
+            // Create initial burst
+            for(let i=0; i<15; i++) createBalloon();
+
+            // Continue creating balloons rapidly
+            balloonInterval = setInterval(createBalloon, 300);
+
+            // STOP balloons after 3 seconds and fade them out
+            setTimeout(() => {
+                clearInterval(balloonInterval); // Stop creating new ones
+                
+                // Optional: Fade out the container so existing ones disappear gracefully
+                container.style.transition = 'opacity 2s ease-out';
+                container.style.opacity = '0';
+                
+                // Clear DOM after fade out
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 2000);
+            }, 3000);
+        }
+
+        function closeSurprise() {
+            const surprisePage = document.getElementById('surprisePage');
+            surprisePage.classList.add('hidden');
+            surprisePage.classList.remove('flex');
+            clearInterval(balloonInterval);
+            document.getElementById('balloonsContainer').innerHTML = '';
+        }
+
+        function createBalloon() {
+            const container = document.getElementById('balloonsContainer');
+            if (!container) return;
+
+            const balloon = document.createElement('div');
+            balloon.classList.add('balloon');
+            
+            const colors = ['#4169E1', '#FFD700', '#FF69B4', '#8A2BE2', '#00FFFF'];
+            const bg = colors[Math.floor(Math.random() * colors.length)];
+            const left = Math.floor(Math.random() * 90) + 5; // Avoid edges
+            
+            balloon.style.backgroundColor = bg;
+            balloon.style.left = `${left}%`;
+            // Randomize speed slightly
+            const duration = Math.random() * 2 + 3; // 3 to 5 seconds
+            balloon.style.animationDuration = `${duration}s`;
+            
+            container.appendChild(balloon);
+
+            // Remove balloon from DOM after animation finishes to prevent lag
+            setTimeout(() => {
+                balloon.remove();
+            }, duration * 1000);
+        }
+    </script>
+</body>
+</html>
